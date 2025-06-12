@@ -1,21 +1,32 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ListaService } from '../lista.service';
 import { Observable } from 'rxjs';
 import { Film } from '../../models/film';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-lista',
-  imports: [CommonModule, RouterLink],
   templateUrl: './lista.component.html',
-  styleUrl: './lista.component.css'
+  styleUrls: ['./lista.component.css'],
+  imports: [FormsModule, CommonModule, RouterModule]
 })
-export class ListaComponent {
-  private readonly listaService = inject(ListaService);
-  public dane$: Observable<Film[]>;
+export class ListaComponent implements OnInit {
+  dane$: Observable<Film[]> | undefined;
+  filterText: string = ''; // tekst filtrowania
 
-  constructor() {
-    this.dane$ = this.listaService.get();
+  constructor(private listaService: ListaService) {}
+
+  ngOnInit(): void {
+    this.getFilms();
+  }
+
+  getFilms(): void {
+    this.dane$ = this.listaService.get(this.filterText);
+  }
+
+  onFilterChange(): void {
+    this.getFilms();
   }
 }
